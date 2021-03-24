@@ -1,11 +1,17 @@
 LIMIT_CHUNK_SIZE = 16
 
-import numpy as np
+
 class Chunk:
     def __init__(self):
-        self.actors = []
-    def addActor(self,actor):
-        self.actors.append(actor)
+        self.voxels = []
+
+    def isFull(self):
+        return self.size >= LIMIT_CHUNK_SIZE
+
+    def addVoxel(self, voxel):
+        self.voxels.append(voxel)
+
+    @property
     def size(self):
-        return sum([actor.size() for actor in self.actors])
+        return len(self.voxels)
 
