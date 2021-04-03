@@ -28,8 +28,23 @@ class ActorManager:
 
 
 class Event:
+    def __init__(self):
+        self.onPygamEvent = False
+
+
+class EventNoPygame(Event):
+    def __init__(self):
+        self.onPygamEvent = False
+
+    def onNotify(self):
+        pass
+
+
+class EventOnPygame(Event):
+
     def __init__(self, event_type):
         self.event_type = event_type
+        self.onPygamEvent = True
 
     def action(self):
         pass
@@ -40,7 +55,7 @@ class Event:
             self.action()
 
 
-class CloseEvent(Event):
+class CloseEvent(EventOnPygame):
     def __init__(self):
         super().__init__(pg.QUIT)
 
@@ -50,22 +65,83 @@ class CloseEvent(Event):
         sys.exit()
 
 
-class KeyDownEvent(Event):
-    def __init__(self):
+class KeyDownEvent(EventOnPygame):
+    def __init__(self, pressed_buffer):
         super().__init__(pg.KEYDOWN)
+        self.pressed_buffer = pressed_buffer
 
     def action(self):
         self.key = self.event.key
-        if (self.key == pg.K_LEFT):
+        self.pressed_buffer.append(self.key)
+       # EventHandler.addPressedInBuffer(self.key)
+        # if (self.key == pg.K_LEFT):
+        #
+        #     glTranslatef(-0.1, 0, 0)
+        # elif (self.key == pg.K_RIGHT):
+        #     glTranslate(0.1, 0, 0)
+
+
+class KeyUpEvent(EventOnPygame):
+    def __init__(self,pressed_buffer):
+        super().__init__(pg.KEYUP)
+        self.pressed_buffer = pressed_buffer
+    def action(self):
+        self.key = self.event.key
+        self.pressed_buffer.remove(self.key)
+        #EventHandler.removePressedInBuffer(self.key)
+
+
+class CameraMoveRightEvent(EventNoPygame):
+    def __init__(self,pressed_buffer):
+        super().__init__()
+        self.pressed_buffer = pressed_buffer
+
+    def onNotify(self):
+        if pg.K_RIGHT in self.pressed_buffer:
+            glTranslatef(0.1, 0, 0)
+
+
+class CameraMoveLeftEvent(EventNoPygame):
+    def __init__(self,pressed_buffer):
+        super().__init__()
+        self.pressed_buffer = pressed_buffer
+
+    def onNotify(self):
+        #if EventHandler.isPressed(pg.K_LEFT):
+        if pg.K_LEFT in self.pressed_buffer:
             glTranslatef(-0.1, 0, 0)
-        elif (self.key == pg.K_RIGHT):
-            glTranslate(0.1, 0, 0)
 
 
 class EventHandler:
-    def __init__(self):
-        self.events = []
 
-    def notify(self, event_in):
-        for event in self.events:
+    def __init__(self):
+        self.eventsByPygame = []
+        self.eventNoPygame = []
+
+
+
+    def addEvent(self, event):
+        if event.onPygamEvent:
+            self.eventsByPygame.append(event)
+        else:
+            self.eventNoPygame.append(event)
+
+
+    def addPressedInBuffer(self, key):
+        self.pressed_buffer.append(key)
+
+
+    def removePressedInBuffer(self, key):
+        self.pressed_buffer.remove(key)
+
+
+    def isPressed(self, key):
+        return key in self.pressed_buffer
+
+    def notifyByEvent(self, event_in):
+        for event in self.eventsByPygame:
             event.onNotify(event_in)
+
+    def notifyNoEvent(self):
+        for event in self.eventNoPygame:
+            event.onNotify()
