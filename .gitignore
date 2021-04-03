@@ -1,3 +1,6 @@
+.idea/
+test_*.py
+Testing.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
