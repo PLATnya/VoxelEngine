@@ -33,6 +33,7 @@ def createWireCube(active, pivot):
         for cubeEdge in cube_edges:
             for cubeVertex in cubeEdge:
                 position = tuple(np.array(cube_vertices[cubeVertex]) * VOXEL_SIZE + pivot)
+                glColor3f(0.0,1.0,0.0)
                 glVertex3fv(position)
 
 
