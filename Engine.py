@@ -5,6 +5,8 @@ from GraphicsEngine import *
 from Chunk import Chunk
 
 
+CAMERA_SPEED = 5
+
 class ChunkManager:
     def __init__(self):
         self.chunks = []
@@ -98,7 +100,7 @@ class CameraMoveRightEvent(EventNoPygame):
 
     def onNotify(self):
         if pg.K_RIGHT in self.pressed_buffer:
-            glTranslatef(0.1, 0, 0)
+            glTranslatef(0.1*CAMERA_SPEED, 0, 0)
 
 
 class CameraMoveLeftEvent(EventNoPygame):
@@ -107,9 +109,10 @@ class CameraMoveLeftEvent(EventNoPygame):
         self.pressed_buffer = pressed_buffer
 
     def onNotify(self):
-        #if EventHandler.isPressed(pg.K_LEFT):
         if pg.K_LEFT in self.pressed_buffer:
-            glTranslatef(-0.1, 0, 0)
+            glTranslatef(-0.1*CAMERA_SPEED, 0, 0)
+
+
 
 
 class EventHandler:
