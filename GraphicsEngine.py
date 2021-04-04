@@ -7,7 +7,16 @@ import pygame as pg
 
 VOXEL_SIZE = 1
 
+class Camera:
+    def __init__(self):
+        self.position = (0,0,0)
+        self.forward = (0,0,0)
+        self.up = (0,0,0)
 
+    def Look(self):
+        gluLookAt(*(self.position + self.forward+self.up))
+
+main_camera = Camera()
 def GraphicSetup():
     pg.init()
     display = (600, 400)
@@ -16,7 +25,7 @@ def GraphicSetup():
     glLoadIdentity()
     gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
 
-    gluLookAt(0, 0, 0, 0, 0, 5, 0, 100, 0)
+    main_camera.Look()
 
 
 def clearScreen():
