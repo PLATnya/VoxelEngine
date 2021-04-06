@@ -2,6 +2,8 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+import glm
+
 import numpy as np
 import pygame as pg
 
@@ -9,12 +11,19 @@ VOXEL_SIZE = 1
 
 class Camera:
     def __init__(self):
-        self.position = (0,0,0)
-        self.forward = (0,0,0)
-        self.up = (0,0,0)
+        self.position = glm.vec3(0,0,0)
+        self.forward = glm.vec3(0,0,1)
+        self.up = glm.vec3(0,1,0)
 
     def Look(self):
-        gluLookAt(*(self.position + self.forward+self.up))
+        gluLookAt(*(self.position.to_tuple() + self.forward.to_tuple()+self.up.to_tuple()))
+
+    def Rotate(self,deltaX,deltaY):
+        glLoadIdentity()
+        self.forward = glm.rotateY(self.forward,deltaY)
+        self.forward = glm.rotateX(self.forward, deltaX)
+        self.Look()
+        print('\n....................................................\n')
 
 main_camera = Camera()
 def GraphicSetup():
@@ -25,12 +34,13 @@ def GraphicSetup():
     glLoadIdentity()
     gluPerspective(45, (display[0] / display[1]), 0.1, 50.0)
 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     main_camera.Look()
 
 
 def clearScreen():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
 
 def createWireCube(active, pivot):
     if active:
@@ -39,6 +49,7 @@ def createWireCube(active, pivot):
         cube_edges = np.array(
             ((0, 1), (0, 3), (0, 4), (1, 2), (1, 7), (2, 5), (2, 3), (3, 6), (4, 6), (4, 7), (5, 6), (5, 7)))
         global VOXEL_SIZE
+
         for cubeEdge in cube_edges:
             for cubeVertex in cubeEdge:
                 position = tuple(np.array(cube_vertices[cubeVertex]) * VOXEL_SIZE + pivot)
