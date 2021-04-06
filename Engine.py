@@ -7,6 +7,7 @@ from Chunk import Chunk
 
 CAMERA_SPEED = 5
 
+CAMERA_ROTATION_SPEED = 0.002
 class ChunkManager:
     def __init__(self):
         self.chunks = []
@@ -111,6 +112,18 @@ class CameraMoveLeftEvent(EventNoPygame):
     def onNotify(self):
         if pg.K_LEFT in self.pressed_buffer:
             glTranslatef(-0.1*CAMERA_SPEED, 0, 0)
+
+
+
+class CameraRotateEvent(EventNoPygame):
+    def __init__(self):
+        super().__init__()
+
+    def onNotify(self):
+        mouse_velocity = np.flip(np.array(pg.mouse.get_rel())*CAMERA_ROTATION_SPEED)
+        mouse_velocity[0]*=-1
+        main_camera.Rotate(*mouse_velocity)
+
 
 
 
