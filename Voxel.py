@@ -3,10 +3,11 @@ from Actor import Actor
 
 
 class Voxel:
-    def __init__(self, chunk_manager: ChunkManager, actor: Actor):
+    def __init__(self, chunk_manager: ChunkManager, actor: Actor, color):
         self.IsActive = True
         self.localPosition = (0, 0, 0)
         self.parent = None
+        self.color = color
         # add voxel to chunk for rendering
         if len(chunk_manager.chunks) == 0 or chunk_manager.chunks[-1].isFull():
             chunk = chunk_manager.createChunk()
