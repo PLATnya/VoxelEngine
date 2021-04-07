@@ -4,8 +4,10 @@ from GraphicsEngine import *
 
 from Chunk import Chunk
 
+CAMERA_MOVEMENT_SPEED = 0.5
 
-CAMERA_SPEED = 5
+CAMERA_ROTATION_SPEED = 0.002
+
 
 class ChunkManager:
     def __init__(self):
@@ -75,44 +77,50 @@ class KeyDownEvent(EventOnPygame):
     def action(self):
         self.key = self.event.key
         self.pressed_buffer.append(self.key)
-       # EventHandler.addPressedInBuffer(self.key)
-        # if (self.key == pg.K_LEFT):
-        #
-        #     glTranslatef(-0.1, 0, 0)
-        # elif (self.key == pg.K_RIGHT):
-        #     glTranslate(0.1, 0, 0)
+    # EventHandler.addPressedInBuffer(self.key)
+    # if (self.key == pg.K_LEFT):
+    #
+    #     glTranslatef(-0.1, 0, 0)
+    # elif (self.key == pg.K_RIGHT):
+    #     glTranslate(0.1, 0, 0)
 
 
 class KeyUpEvent(EventOnPygame):
-    def __init__(self,pressed_buffer):
+    def __init__(self, pressed_buffer):
         super().__init__(pg.KEYUP)
         self.pressed_buffer = pressed_buffer
+
     def action(self):
         self.key = self.event.key
         self.pressed_buffer.remove(self.key)
-        #EventHandler.removePressedInBuffer(self.key)
 
 
-class CameraMoveRightEvent(EventNoPygame):
-    def __init__(self,pressed_buffer):
+class CameraMoveEvent(EventNoPygame):
+    def __init__(self, pressed_buffer):
         super().__init__()
         self.pressed_buffer = pressed_buffer
 
     def onNotify(self):
-        if pg.K_RIGHT in self.pressed_buffer:
-            glTranslatef(0.1*CAMERA_SPEED, 0, 0)
+        if pg.K_d in self.pressed_buffer:
+            main_camera.MoveRight(CAMERA_MOVEMENT_SPEED)
+        if pg.K_a in self.pressed_buffer:
+            main_camera.MoveRight(-CAMERA_MOVEMENT_SPEED)
+        if pg.K_w in self.pressed_buffer:
+            main_camera.MoveForward(CAMERA_MOVEMENT_SPEED)
+        if pg.K_s in self.pressed_buffer:
+            main_camera.MoveForward(-CAMERA_MOVEMENT_SPEED)
 
 
-class CameraMoveLeftEvent(EventNoPygame):
-    def __init__(self,pressed_buffer):
+
+
+class CameraRotateEvent(EventNoPygame):
+    def __init__(self):
         super().__init__()
-        self.pressed_buffer = pressed_buffer
 
     def onNotify(self):
-        if pg.K_LEFT in self.pressed_buffer:
-            glTranslatef(-0.1*CAMERA_SPEED, 0, 0)
-
-
+        mouse_velocity = np.flip(np.array(pg.mouse.get_rel()) * CAMERA_ROTATION_SPEED)
+        mouse_velocity[1] *= -1
+        main_camera.Rotate(*mouse_velocity)
 
 
 class EventHandler:
@@ -121,22 +129,17 @@ class EventHandler:
         self.eventsByPygame = []
         self.eventNoPygame = []
 
-
-
     def addEvent(self, event):
         if event.onPygamEvent:
             self.eventsByPygame.append(event)
         else:
             self.eventNoPygame.append(event)
 
-
     def addPressedInBuffer(self, key):
         self.pressed_buffer.append(key)
 
-
     def removePressedInBuffer(self, key):
         self.pressed_buffer.remove(key)
-
 
     def isPressed(self, key):
         return key in self.pressed_buffer
