@@ -76,5 +76,5 @@ def createWireCube(active, pivot, color):
 def renderChunk(chunk):
     glBegin(GL_LINES)
     for voxel in chunk.voxels:
-        createWireCube(True, np.array(voxel.parent.worldPosition) + np.array(voxel.localPosition), voxel.color)
+        createWireCube(True, np.array(voxel.globalPosition), voxel.color)
     glEnd()
