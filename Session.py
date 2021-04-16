@@ -1,7 +1,9 @@
-import numpy as np
 from enum import Enum
 from Engine import *
+
 MATRIX_SIZE = 100
+
+
 class GameSessionState(Enum):
     PRELIFE = -1
     LIFE = 0
@@ -20,7 +22,7 @@ class GameSessionMeta(type):
 
 class GameSession(metaclass=GameSessionMeta):
     def InitSession(self):
-        self.matrix = np.empty((MATRIX_SIZE,MATRIX_SIZE,MATRIX_SIZE),dtype=np.object0)
+        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE), dtype=np.object0)
         self.matrix.fill([None, 0])
         self.state = GameSessionState.PRELIFE
 
@@ -31,8 +33,17 @@ class GameSession(metaclass=GameSessionMeta):
         self.chunk_manager = ChunkManager()
         self.actor_manager = ActorManager()
         from Voxel import Voxel
-        self.construct_voxel = Voxel((0,1,0))
+        self.construct_voxel = Voxel((0, 1, 0))
 
-    def addEvent(self,event):
+    def AddEvent(self, event):
         self.events_handler.addEvent(event)
 
+    def MainLoop(self):
+        while True:
+            self.events_handler.notifyNoEvent()
+            for event in pg.event.get():
+                self.events_handler.notifyByEvent(event)
+
+            clearScreen()
+            self.chunk_manager.renderAll()
+            pg.display.flip()
