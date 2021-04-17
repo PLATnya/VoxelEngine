@@ -112,7 +112,6 @@ class CameraMoveEvent(EventNoPygame):
 
 
 
-
 class CameraRotateEvent(EventNoPygame):
     def __init__(self):
         super().__init__()
@@ -121,6 +120,17 @@ class CameraRotateEvent(EventNoPygame):
         mouse_velocity = np.flip(np.array(pg.mouse.get_rel()) * CAMERA_ROTATION_SPEED)
         mouse_velocity[1] *= -1
         main_camera.Rotate(*mouse_velocity)
+
+class EscapeButtonExitEvent(EventNoPygame):
+    def __init__(self, pressed_buffer):
+        super().__init__()
+        self.pressed_buffer = pressed_buffer
+
+    def onNotify(self):
+        if pg.K_ESCAPE in self.pressed_buffer:
+            exit()
+            pg.quit()
+            sys.exit()
 
 
 class EventHandler:
