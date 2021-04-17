@@ -3,11 +3,10 @@ from Actor import Actor
 import Session
 import Session
 class Voxel:
-    def __init__(self, color, actor = None):
+    def __init__(self, color, actor = None, position = (0,0,0)):
         chunk_manager = Session.GameSession().chunk_manager
         self.IsActive = True
-        self.localPosition = (0, 0, 0)
-        self.globalPosition = (0,0,0)
+
         self.parent = None
         self.color = color
         # add voxel to chunk for rendering
@@ -21,8 +20,7 @@ class Voxel:
         if (actor != None):
             actor.voxels.append(self)
             self.parent = actor
-
-            self.globalPosition = np.array(self.parent.worldPosition)
+        self.SetPosition(*position)
 
     def SetPosition(self, x,y,z):
         #TODO: grid position
@@ -31,4 +29,5 @@ class Voxel:
             self.localPosition = np.array([x,y,z])
             self.globalPosition = np.array(self.parent.worldPosition) + np.array(self.localPosition)
         else:
+            self.localPosition = np.array([0,0,0])
             self.globalPosition = np.array([x,y,z])
