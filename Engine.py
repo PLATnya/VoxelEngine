@@ -77,12 +77,6 @@ class KeyDownEvent(EventOnPygame):
     def action(self):
         self.key = self.event.key
         self.pressed_buffer.append(self.key)
-    # EventHandler.addPressedInBuffer(self.key)
-    # if (self.key == pg.K_LEFT):
-    #
-    #     glTranslatef(-0.1, 0, 0)
-    # elif (self.key == pg.K_RIGHT):
-    #     glTranslate(0.1, 0, 0)
 
 
 class KeyUpEvent(EventOnPygame):

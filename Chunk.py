@@ -11,6 +11,9 @@ class Chunk:
     def addVoxel(self, voxel):
         self.voxels.append(voxel)
 
+    def removeVoxel(self,voxel):
+        self.voxels.remove(voxel)
+
     @property
     def size(self):
         return len(self.voxels)

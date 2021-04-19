@@ -12,13 +12,15 @@ class Voxel:
         self.parent = None
         self.color = color
         # add voxel to chunk for rendering
+        self.chunkRef = None
         if len(chunk_manager.chunks) == 0 or chunk_manager.chunks[-1].isFull():
-            chunk = chunk_manager.createChunk()
-            chunk.addVoxel(self)
+            self.chunkRef = chunk_manager.createChunk()
+            self.chunkRef.addVoxel(self)
         else:
-            chunk_manager.chunks[-1].addVoxel(self)
+            self.chunkRef = chunk_manager.chunks[-1]
+            self.chunkRef.addVoxel(self)
 
-        # add voxel to actor for transformations
+            # add voxel to actor for transformations
         if (actor != None):
             actor.voxels.append(self)
             self.parent = actor
@@ -38,5 +40,5 @@ class Voxel:
             self.localPosition = np.array([0, 0, 0])
             self.globalPosition = np.array([x, y, z])
 
-    def GetPosition(self):
-        return
+    def __del__(self):
+        self.chunkRef.removeVoxel(self)

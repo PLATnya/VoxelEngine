@@ -34,6 +34,8 @@ class GameSession(metaclass=GameSessionMeta):
         self.actor_manager = ActorManager()
         from Voxel import Voxel
         self.construct_voxel = Voxel((0, 1, 0))
+        #TODO: destruction of voxels
+        self.ChangeState(GameSessionState.LIFE)
 
     def AddEvent(self, event):
         self.events_handler.addEvent(event)
@@ -47,3 +49,8 @@ class GameSession(metaclass=GameSessionMeta):
             clearScreen()
             self.chunk_manager.renderAll()
             pg.display.flip()
+
+    def ChangeState(self, new_state):
+        if new_state == GameSessionState.LIFE:
+            self.construct_voxel = None
+        self.state = new_state
