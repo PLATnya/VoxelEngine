@@ -47,7 +47,7 @@ def GraphicSetup():
     pg.display.set_mode((0,0), DOUBLEBUF | OPENGL, FULLSCREEN)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    gluPerspective(45, (display[0] / display[1]), 0.1, 200.0)
+    gluPerspective(60, (display[0] / display[1]), 0.1, 200.0)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
