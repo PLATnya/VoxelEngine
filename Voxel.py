@@ -27,8 +27,8 @@ class Voxel:
         self.SetPosition(*position)
 
     def SetPosition(self, gridX, gridY, gridZ):
-        if Session.GameSession().matrix[gridX, gridY, gridZ] == None:
-            Session.GameSession().matrix[gridX, gridY, gridZ] = self
+        if Session.GameSession().matrix_field[gridX, gridY, gridZ] == None:
+            Session.GameSession().matrix_field[gridX, gridY, gridZ] = self
         gridFactor = VOXEL_SIZE * 2
         x = gridX * gridFactor
         y = gridY * gridFactor
@@ -40,5 +40,9 @@ class Voxel:
             self.localPosition = np.array([0, 0, 0])
             self.globalPosition = np.array([x, y, z])
 
-    def __del__(self):
+    def delete(self):
+        #TODO: удалние обьекта, на который ссылаются несколько раз одновременно
         self.chunkRef.removeVoxel(self)
+
+    def __del__(self):
+        print("deleting voxel")

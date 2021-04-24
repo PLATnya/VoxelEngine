@@ -22,8 +22,7 @@ class GameSessionMeta(type):
 
 class GameSession(metaclass=GameSessionMeta):
     def InitSession(self):
-        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE), dtype=np.object0)
-        self.matrix.fill([None, 0])
+        self.matrix_field = MatrixField()
         self.state = GameSessionState.PRELIFE
 
         GraphicSetup()
@@ -51,6 +50,38 @@ class GameSession(metaclass=GameSessionMeta):
             pg.display.flip()
 
     def ChangeState(self, new_state):
+        #TODO:changing states
         if new_state == GameSessionState.LIFE:
+            #delete construct_voxel or set it unactiive
+            self.construct_voxel.delete()
             self.construct_voxel = None
+            #save buff
+            # start main life looop
+        elif new_state == GameSessionState.PRELIFE:
+            # if have buuf update matrix by buf else create matrix orclear it
+            #activate construct voxel
+            pass
+        elif new_state == GameSessionState.AFTERLIFE:
+            #do not create construct voxel
+            #add restart button or event
+            # gofuck yourself
+            pass
         self.state = new_state
+
+class MatrixField:
+    def __init__(self):
+        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE), dtype=np.object0)
+        self.matrix.fill([None, 0])
+        self.buff = np.array([],dtype = np.object0)
+
+    def __getitem__(self, item):
+        return self.matrix[item]
+
+    def SaveBuff(self):
+        pass
+
+    def IsEmpty(self):
+        pass
+
+
+
