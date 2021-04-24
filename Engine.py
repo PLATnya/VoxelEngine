@@ -4,7 +4,7 @@ from GraphicsEngine import *
 
 from Chunk import Chunk
 
-CAMERA_MOVEMENT_SPEED = 0.5
+CAMERA_MOVEMENT_SPEED = 0.3
 
 CAMERA_ROTATION_SPEED = 0.002
 
@@ -69,7 +69,7 @@ class CloseEvent(EventOnPygame):
         sys.exit()
 
 
-class KeyDownEvent(EventOnPygame):
+class KeyEvent(EventOnPygame):
     def __init__(self, pressed_buffer):
         super().__init__(pg.KEYDOWN)
         self.pressed_buffer = pressed_buffer
@@ -125,6 +125,25 @@ class EscapeButtonExitEvent(EventNoPygame):
             exit()
             pg.quit()
             sys.exit()
+
+
+class KeyDownEvent(EventNoPygame):
+    pressed = False
+    def __init__(self, pressed_buffer):
+        super().__init__()
+        self.key = None
+        self.pressed_buffer = pressed_buffer
+    def onNotify(self):
+        if not self.pressed:
+            if self.key in self.pressed_buffer:
+                self.pressed = True
+                return True
+        else:
+            if self.key not in self.pressed_buffer:
+                self.pressed = False
+        return False
+
+
 
 
 class EventHandler:
