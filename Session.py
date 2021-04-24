@@ -33,7 +33,6 @@ class GameSession(metaclass=GameSessionMeta):
         self.actor_manager = ActorManager()
         from Voxel import Voxel
         self.construct_voxel = Voxel((0, 1, 0))
-        #TODO: destruction of voxels
         self.ChangeState(GameSessionState.LIFE)
 
     def AddEvent(self, event):
@@ -52,12 +51,12 @@ class GameSession(metaclass=GameSessionMeta):
     def ChangeState(self, new_state):
         #TODO:changing states
         if new_state == GameSessionState.LIFE:
-            #delete construct_voxel or set it unactiive
-            self.construct_voxel.delete()
-            self.construct_voxel = None
-            #save buff
+            self.construct_voxel.isActive = False
+            self.matrix_field.SaveBuff()
+
             # start main life looop
         elif new_state == GameSessionState.PRELIFE:
+            self.construct_voxel.isActive = True
             # if have buuf update matrix by buf else create matrix orclear it
             #activate construct voxel
             pass
@@ -70,8 +69,9 @@ class GameSession(metaclass=GameSessionMeta):
 
 class MatrixField:
     def __init__(self):
-        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE), dtype=np.object0)
-        self.matrix.fill([None, 0])
+        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE,2))
+        self.matrix[:,:,:,0] = None
+        self.matrix[:,:,:,1] = 0
         self.buff = np.array([],dtype = np.object0)
 
     def __getitem__(self, item):

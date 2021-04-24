@@ -7,7 +7,7 @@ import Session
 class Voxel:
     def __init__(self, color, actor=None, position=(0, 0, 0)):
         chunk_manager = Session.GameSession().chunk_manager
-        self.IsActive = True
+        self.isActive = True
 
         self.parent = None
         self.color = color
@@ -40,8 +40,7 @@ class Voxel:
             self.localPosition = np.array([0, 0, 0])
             self.globalPosition = np.array([x, y, z])
 
-    def delete(self):
-        #TODO: удалние обьекта, на который ссылаются несколько раз одновременно
+    def DeleteFromChunk(self):
         self.chunkRef.removeVoxel(self)
 
     def __del__(self):
