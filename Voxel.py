@@ -1,4 +1,4 @@
-from Engine import np, VOXEL_SIZE
+from GraphicsEngine import np, VOXEL_SIZE
 import Session
 
 

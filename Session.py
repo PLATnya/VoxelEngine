@@ -1,5 +1,7 @@
 from enum import Enum
-from Engine import *
+from GraphicsEngine import pg, clear_screen,graphic_setup
+from Engine import EventHandler, ChunkManager, ActorManager
+from Engine import PressEndEvent, PressStartEvent, PressRestartEvent
 import numpy as np
 MATRIX_SIZE = 100
 

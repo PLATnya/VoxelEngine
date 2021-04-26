@@ -1,6 +1,6 @@
 import sys
 
-from GraphicsEngine import *
+from GraphicsEngine import render_chunk, pg,main_camera, np
 
 from Chunk import Chunk
 
@@ -33,11 +33,15 @@ class ActorManager:
 
 class Event:
     def __init__(self):
+        from Session import GameSession, GameSessionState
+        self.game_session = GameSession()
+        self.state = GameSessionState
         self.onPygameEvent = False
 
 
 class EventNoPygame(Event):
     def __init__(self):
+
         super().__init__()
         self.onPygameEvent = False
 
@@ -158,8 +162,7 @@ class PressRestartEvent(KeyDownEvent):
 
     def on_notify(self):
         if super(PressRestartEvent, self).on_notify():
-            import Session
-            Session.GameSession().change_state(Session.GameSessionState.PRELIFE)
+            self.game_session.change_state(self.state.PRELIFE)
 
 
 class PressStartEvent(KeyDownEvent):
@@ -169,8 +172,7 @@ class PressStartEvent(KeyDownEvent):
 
     def on_notify(self):
         if super(PressStartEvent, self).on_notify():
-            import Session
-            Session.GameSession().change_state(Session.GameSessionState.LIFE)
+            self.game_session.change_state(self.state.LIFE)
 
 
 class PressEndEvent(KeyDownEvent):
@@ -180,8 +182,7 @@ class PressEndEvent(KeyDownEvent):
 
     def on_notify(self):
         if super(PressEndEvent, self).on_notify():
-            import Session
-            Session.GameSession().change_state(Session.GameSessionState.AFTERLIFE)
+            self.game_session.change_state(self.state.AFTERLIFE)
 
 
 class EventHandler:
