@@ -151,6 +151,39 @@ class KeyDownEvent(EventNoPygame):
         return False
 
 
+class PressRestartEvent(KeyDownEvent):
+    def __init__(self, pressed_buffer):
+        super().__init__(pressed_buffer)
+        self.key = pg.K_r
+
+    def on_notify(self):
+        if super(PressRestartEvent, self).on_notify():
+            import Session
+            Session.GameSession().change_state(Session.GameSessionState.PRELIFE)
+
+
+class PressStartEvent(KeyDownEvent):
+    def __init__(self, pressed_buffer):
+        super().__init__(pressed_buffer)
+        self.key = pg.K_SPACE
+
+    def on_notify(self):
+        if super(PressStartEvent, self).on_notify():
+            import Session
+            Session.GameSession().change_state(Session.GameSessionState.LIFE)
+
+
+class PressEndEvent(KeyDownEvent):
+    def __init__(self, pressed_buffer):
+        super().__init__(pressed_buffer)
+        self.key = pg.K_q
+
+    def on_notify(self):
+        if super(PressEndEvent, self).on_notify():
+            import Session
+            Session.GameSession().change_state(Session.GameSessionState.AFTERLIFE)
+
+
 class EventHandler:
 
     def __init__(self):
@@ -163,6 +196,12 @@ class EventHandler:
             self.eventsByPygame.append(event)
         else:
             self.eventNoPygame.append(event)
+
+    def remove_event(self, event):
+        if event in self.eventsByPygame:
+            self.eventsByPygame.remove(event)
+        elif event in self.eventNoPygame:
+            self.eventNoPygame.remove(event)
 
     def add_pressed_in_buffer(self, key):
         self.pressed_buffer.append(key)

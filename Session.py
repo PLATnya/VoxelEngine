@@ -1,6 +1,6 @@
 from enum import Enum
 from Engine import *
-
+import numpy as np
 MATRIX_SIZE = 100
 
 
@@ -28,12 +28,15 @@ class GameSessionMeta(type):
             cls.actor_manager = ActorManager()
             from Voxel import Voxel
             cls.construct_voxel = Voxel((0, 1, 0))
+            cls.restart_event = PressRestartEvent(cls.pressed_buffer)
+            cls.start_event = PressStartEvent(cls.pressed_buffer)
+            cls.end_event = PressEndEvent(cls.pressed_buffer)
         return cls._instances[cls]
 
 
 class GameSession(metaclass=GameSessionMeta):
     def init_session(self):
-        self.change_state(GameSessionState.LIFE)
+        self.change_state(GameSessionState.PRELIFE)
 
     def add_event(self, event):
         self.events_handler.add_event(event)
@@ -43,36 +46,37 @@ class GameSession(metaclass=GameSessionMeta):
             self.events_handler.notify_no_event()
             for event in pg.event.get():
                 self.events_handler.notify_by_event(event)
-
             clear_screen()
             self.chunk_manager.render_all()
             pg.display.flip()
 
     def change_state(self, new_state):
-        # TODO:changing states
         if new_state == GameSessionState.LIFE:
+
             self.construct_voxel.isActive = False
             self.matrix_field.save_buff()
-
-            # start main life looop
+            self.events_handler.remove_event(self.start_event)
+            self.events_handler.add_event(self.end_event)
+            # TODO: start main life looop
         elif new_state == GameSessionState.PRELIFE:
             self.construct_voxel.isActive = True
-            # if have buuf update matrix by buf else create matrix orclear it
-            # activate construct voxel
-            pass
+            self.matrix_field.load_buff()
+            self.events_handler.remove_event(self.restart_event)
+            self.events_handler.add_event(self.start_event)
+
         elif new_state == GameSessionState.AFTERLIFE:
-            # do not create construct voxel
+            self.construct_voxel.isActive = False
             # add restart button or event
-            # gofuck yourself
-            pass
+            self.events_handler.add_event(self.restart_event)
+            self.events_handler.remove_event(self.end_event)
         self.state = new_state
+        print(self.state)
 
 
 class MatrixField:
     def __init__(self):
         self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE, 2), dtype=object)
-        self.matrix[:, :, :, 0] = None
-        self.matrix[:, :, :, 1] = 0
+        self.clear_matrix()
         self.buff_indexes = None
         self.buff_positions = None
 
@@ -88,9 +92,17 @@ class MatrixField:
         self.buff_positions = [i.globalPosition for i in self.buff_positions]
 
     def load_buff(self):
-        for n, index in enumerate(self.buff_indexes):
-            from Voxel import Voxel
-            self.matrix[index[0], index[1], index[2]] = Voxel((1, 0, 1), position=self.buff_positions[n])
+        if self.buff_indexes:
+            for n, index in enumerate(self.buff_indexes):
+                from Voxel import Voxel
+                self.matrix[index[0], index[1], index[2]] = Voxel((1, 0, 1), position=self.buff_positions[n])
 
     def is_empty(self):
-        pass
+        voxels_matrix = self.matrix[:, :, :, 0]
+        return (np.sum(voxels_matrix == None)/np.size(voxels_matrix)) == 1.0
+
+    def clear_matrix(self):
+        # TODO: matrix delete voxels on restart
+        self.matrix[:, :, :, 0] = None
+        self.matrix[:, :, :, 1] = 0
+
