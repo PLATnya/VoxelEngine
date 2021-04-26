@@ -1,3 +1,4 @@
+import numpy as np
 from enum import Enum
 from Engine import *
 
@@ -17,28 +18,28 @@ class GameSessionMeta(type):
         if cls not in cls._instances:
             instance = super().__call__(*args, **kwargs)
             cls._instances[cls] = instance
+            cls.matrix_field = MatrixField()
+            cls.state = GameSessionState.PRELIFE
+
+            GraphicSetup()
+            cls.events_handler = EventHandler()
+            cls.pressed_buffer = []
+
+            cls.chunk_manager = ChunkManager()
+            cls.actor_manager = ActorManager()
+            from Voxel import Voxel
+            cls.construct_voxel = Voxel((0, 1, 0))
         return cls._instances[cls]
 
 
 class GameSession(metaclass=GameSessionMeta):
-    def InitSession(self):
-        self.matrix_field = MatrixField()
-        self.state = GameSessionState.PRELIFE
+    def init_session(self):
+        self.change_state(GameSessionState.LIFE)
 
-        GraphicSetup()
-        self.events_handler = EventHandler()
-        self.pressed_buffer = []
-
-        self.chunk_manager = ChunkManager()
-        self.actor_manager = ActorManager()
-        from Voxel import Voxel
-        self.construct_voxel = Voxel((0, 1, 0))
-        self.ChangeState(GameSessionState.LIFE)
-
-    def AddEvent(self, event):
+    def add_event(self, event):
         self.events_handler.addEvent(event)
 
-    def MainLoop(self):
+    def main_loop(self):
         while True:
             self.events_handler.notifyNoEvent()
             for event in pg.event.get():
@@ -48,40 +49,49 @@ class GameSession(metaclass=GameSessionMeta):
             self.chunk_manager.renderAll()
             pg.display.flip()
 
-    def ChangeState(self, new_state):
-        #TODO:changing states
+    def change_state(self, new_state):
+        # TODO:changing states
         if new_state == GameSessionState.LIFE:
             self.construct_voxel.isActive = False
-            self.matrix_field.SaveBuff()
+            self.matrix_field.save_buff()
 
             # start main life looop
         elif new_state == GameSessionState.PRELIFE:
             self.construct_voxel.isActive = True
             # if have buuf update matrix by buf else create matrix orclear it
-            #activate construct voxel
+            # activate construct voxel
             pass
         elif new_state == GameSessionState.AFTERLIFE:
-            #do not create construct voxel
-            #add restart button or event
+            # do not create construct voxel
+            # add restart button or event
             # gofuck yourself
             pass
         self.state = new_state
 
+
 class MatrixField:
     def __init__(self):
-        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE,2))
-        self.matrix[:,:,:,0] = None
-        self.matrix[:,:,:,1] = 0
-        self.buff = np.array([],dtype = np.object0)
+        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE, 2), dtype=object)
+        self.matrix[:, :, :, 0] = None
+        self.matrix[:, :, :, 1] = 0
+        self.buff_indexes = None
+        self.buff_positions = None
 
     def __getitem__(self, item):
         return self.matrix[item]
 
-    def SaveBuff(self):
+    def __setitem__(self, key, value):
+        self.matrix[key] = value
+
+    def save_buff(self):
+        self.buff_indexes = np.argwhere(np.invert(self.matrix[:, :, :, 0] == None))
+        self.buff_positions = self.matrix[self.buff_indexes[:, 0], self.buff_indexes[:, 1], self.buff_indexes[:, 2], 0]
+        self.buff_positions = [i.globalPosition for i in self.buff_positions]
+
+    def load_buff(self):
+        for n, index in enumerate(self.buff_indexes):
+            from Voxel import Voxel
+            self.matrix[index[0], index[1], index[2]] = Voxel((1, 0, 1), position=self.buff_positions[n])
+
+    def is_empty(self):
         pass
-
-    def IsEmpty(self):
-        pass
-
-
-
