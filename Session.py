@@ -1,4 +1,3 @@
-import numpy as np
 from enum import Enum
 from Engine import *
 
@@ -21,7 +20,7 @@ class GameSessionMeta(type):
             cls.matrix_field = MatrixField()
             cls.state = GameSessionState.PRELIFE
 
-            GraphicSetup()
+            graphic_setup()
             cls.events_handler = EventHandler()
             cls.pressed_buffer = []
 
@@ -37,16 +36,16 @@ class GameSession(metaclass=GameSessionMeta):
         self.change_state(GameSessionState.LIFE)
 
     def add_event(self, event):
-        self.events_handler.addEvent(event)
+        self.events_handler.add_event(event)
 
     def main_loop(self):
         while True:
-            self.events_handler.notifyNoEvent()
+            self.events_handler.notify_no_event()
             for event in pg.event.get():
-                self.events_handler.notifyByEvent(event)
+                self.events_handler.notify_by_event(event)
 
-            clearScreen()
-            self.chunk_manager.renderAll()
+            clear_screen()
+            self.chunk_manager.render_all()
             pg.display.flip()
 
     def change_state(self, new_state):

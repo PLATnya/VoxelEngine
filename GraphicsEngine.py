@@ -19,46 +19,46 @@ class Camera:
         self.yaw = -90.0
         self.pitch = 0
 
-    def Look(self):
+    def look(self):
         gluLookAt(*(self.position.to_tuple() + (self.position + self.forward).to_tuple() + self.up.to_tuple()))
 
-    def Rotate(self, deltaX, deltaY):
+    def rotate(self, delta_x, delta_y):
         glLoadIdentity()
-        self.forward = glm.rotate(self.forward, deltaY, self.up)
-        self.right = glm.rotate(self.right, deltaY, self.up)
-        self.forward = glm.rotate(self.forward, deltaX, self.right)
-        self.Look()
+        self.forward = glm.rotate(self.forward, delta_y, self.up)
+        self.right = glm.rotate(self.right, delta_y, self.up)
+        self.forward = glm.rotate(self.forward, delta_x, self.right)
+        self.look()
 
-    def MoveForward(self, speed):
+    def move_forward(self, speed):
         self.position += self.forward * speed
-        self.Look()
+        self.look()
 
-    def MoveRight(self, speed):
+    def move_right(self, speed):
         self.position += glm.cross(self.forward, self.up) * speed
-        self.Look()
+        self.look()
 
 
 main_camera = Camera()
 
 
-def GraphicSetup():
+def graphic_setup():
     pg.init()
     display = (600, 400)
-    pg.display.set_mode((0,0), DOUBLEBUF | OPENGL, FULLSCREEN)
+    pg.display.set_mode((0, 0), DOUBLEBUF | OPENGL, FULLSCREEN)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     gluPerspective(60, (display[0] / display[1]), 0.1, 200.0)
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    main_camera.Look()
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    main_camera.look()
 
 
-def clearScreen():
+def clear_screen():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 
-def createWireCube(active, pivot, color):
+def create_wire_cube(active, pivot, color):
     if active:
         cube_vertices = np.array(
             ((1, 1, 1), (1, 1, -1), (1, -1, -1), (1, -1, 1), (-1, 1, 1), (-1, -1, -1), (-1, -1, 1), (-1, 1, -1)))
@@ -73,8 +73,8 @@ def createWireCube(active, pivot, color):
                 glVertex3fv(position)
 
 
-def renderChunk(chunk):
+def render_chunk(chunk):
     glBegin(GL_LINES)
     for voxel in chunk.voxels:
-        createWireCube(voxel.isActive, np.array(voxel.globalPosition), voxel.color)
+        create_wire_cube(voxel.isActive, np.array(voxel.globalPosition), voxel.color)
     glEnd()

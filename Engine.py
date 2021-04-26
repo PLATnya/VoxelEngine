@@ -13,47 +13,50 @@ class ChunkManager:
     def __init__(self):
         self.chunks = []
 
-    def createChunk(self):
+    def create_chunk(self):
         chunk = Chunk()
         self.chunks.append(chunk)
         return chunk
 
-    def renderAll(self):
+    def render_all(self):
         for chunk in self.chunks:
-            renderChunk(chunk)
+            render_chunk(chunk)
 
 
 class ActorManager:
     def __init__(self):
         self.actors = []
 
-    def addActor(self, actor):
+    def add_actor(self, actor):
         self.actors.append(actor)
 
 
 class Event:
     def __init__(self):
-        self.onPygamEvent = False
+        self.onPygameEvent = False
 
 
 class EventNoPygame(Event):
     def __init__(self):
-        self.onPygamEvent = False
+        super().__init__()
+        self.onPygameEvent = False
 
-    def onNotify(self):
+    def on_notify(self):
         pass
 
 
 class EventOnPygame(Event):
 
     def __init__(self, event_type):
+        super().__init__()
         self.event_type = event_type
-        self.onPygamEvent = True
+        self.onPygameEvent = True
+        self.event = None
 
     def action(self):
         pass
 
-    def onNotify(self, event):
+    def on_notify(self, event):
         self.event = event
         if self.event_type == event.type:
             self.action()
@@ -73,6 +76,7 @@ class KeyEvent(EventOnPygame):
     def __init__(self, pressed_buffer):
         super().__init__(pg.KEYDOWN)
         self.pressed_buffer = pressed_buffer
+        self.key = None
 
     def action(self):
         self.key = self.event.key
@@ -83,6 +87,7 @@ class KeyUpEvent(EventOnPygame):
     def __init__(self, pressed_buffer):
         super().__init__(pg.KEYUP)
         self.pressed_buffer = pressed_buffer
+        self.key = None
 
     def action(self):
         self.key = self.event.key
@@ -94,33 +99,33 @@ class CameraMoveEvent(EventNoPygame):
         super().__init__()
         self.pressed_buffer = pressed_buffer
 
-    def onNotify(self):
+    def on_notify(self):
         if pg.K_d in self.pressed_buffer:
-            main_camera.MoveRight(CAMERA_MOVEMENT_SPEED)
+            main_camera.move_right(CAMERA_MOVEMENT_SPEED)
         if pg.K_a in self.pressed_buffer:
-            main_camera.MoveRight(-CAMERA_MOVEMENT_SPEED)
+            main_camera.move_right(-CAMERA_MOVEMENT_SPEED)
         if pg.K_w in self.pressed_buffer:
-            main_camera.MoveForward(CAMERA_MOVEMENT_SPEED)
+            main_camera.move_forward(CAMERA_MOVEMENT_SPEED)
         if pg.K_s in self.pressed_buffer:
-            main_camera.MoveForward(-CAMERA_MOVEMENT_SPEED)
-
+            main_camera.move_forward(-CAMERA_MOVEMENT_SPEED)
 
 
 class CameraRotateEvent(EventNoPygame):
     def __init__(self):
         super().__init__()
 
-    def onNotify(self):
+    def on_notify(self):
         mouse_velocity = np.flip(np.array(pg.mouse.get_rel()) * CAMERA_ROTATION_SPEED)
         mouse_velocity[1] *= -1
-        main_camera.Rotate(*mouse_velocity)
+        main_camera.rotate(*mouse_velocity)
+
 
 class EscapeButtonExitEvent(EventNoPygame):
     def __init__(self, pressed_buffer):
         super().__init__()
         self.pressed_buffer = pressed_buffer
 
-    def onNotify(self):
+    def on_notify(self):
         if pg.K_ESCAPE in self.pressed_buffer:
             exit()
             pg.quit()
@@ -129,11 +134,13 @@ class EscapeButtonExitEvent(EventNoPygame):
 
 class KeyDownEvent(EventNoPygame):
     pressed = False
+
     def __init__(self, pressed_buffer):
         super().__init__()
         self.key = None
         self.pressed_buffer = pressed_buffer
-    def onNotify(self):
+
+    def on_notify(self):
         if not self.pressed:
             if self.key in self.pressed_buffer:
                 self.pressed = True
@@ -144,33 +151,32 @@ class KeyDownEvent(EventNoPygame):
         return False
 
 
-
-
 class EventHandler:
 
     def __init__(self):
+        self.pressed_buffer = None
         self.eventsByPygame = []
         self.eventNoPygame = []
 
-    def addEvent(self, event):
-        if event.onPygamEvent:
+    def add_event(self, event):
+        if event.onPygameEvent:
             self.eventsByPygame.append(event)
         else:
             self.eventNoPygame.append(event)
 
-    def addPressedInBuffer(self, key):
+    def add_pressed_in_buffer(self, key):
         self.pressed_buffer.append(key)
 
-    def removePressedInBuffer(self, key):
+    def remove_pressed_in_buffer(self, key):
         self.pressed_buffer.remove(key)
 
-    def isPressed(self, key):
+    def is_pressed(self, key):
         return key in self.pressed_buffer
 
-    def notifyByEvent(self, event_in):
+    def notify_by_event(self, event_in):
         for event in self.eventsByPygame:
-            event.onNotify(event_in)
+            event.on_notify(event_in)
 
-    def notifyNoEvent(self):
+    def notify_no_event(self):
         for event in self.eventNoPygame:
-            event.onNotify()
+            event.on_notify()
