@@ -1,0 +1,6 @@
+numpy~=1.19.2
+pygame~=2.0.1
+pygame~=2.0.1
+PyGLM~=2.0.0
+PyOpenGL~=3.1.5
+PyOpenGL-accelerate~=3.1.5
