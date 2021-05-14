@@ -3,7 +3,7 @@ import Session
 
 
 class Voxel:
-    def __init__(self, color, actor=None, position=(0, 0, 0)):
+    def __init__(self, color, actor=None, position=(0, 0, 0), is_indexed_by_matrix = True):
         chunk_manager = Session.GameSession().chunk_manager
         self.isActive = True
         self.localPosition = None
@@ -23,21 +23,27 @@ class Voxel:
         if actor is not None:
             actor.voxels.append(self)
             self.parent = actor
-        self.set_position(*position)
+        self.set_position(*position, is_indexed_by_matrix)
 
-    def set_position(self, grid_x, grid_y, grid_z):
-        if Session.GameSession().matrix_field[grid_x, grid_y, grid_z, 0] is None:
-            Session.GameSession().matrix_field[grid_x, grid_y, grid_z] = self
-        grid_factor = VOXEL_SIZE * 2
-        x = grid_x * grid_factor
-        y = grid_y * grid_factor
-        z = grid_z * grid_factor
-        if self.parent is not None:
-            self.localPosition = np.array([x, y, z])
-            self.globalPosition = np.array(self.parent.worldPosition) + np.array(self.localPosition)
-        else:
-            self.localPosition = np.array([0, 0, 0])
-            self.globalPosition = np.array([x, y, z])
+    def set_position(self, grid_x, grid_y, grid_z, is_indexed_by_matrix):
+        is_can_be_places= True
+
+        if is_indexed_by_matrix:
+            if Session.GameSession().matrix_field[grid_x, grid_y, grid_z, 0] is None:
+                Session.GameSession().matrix_field[grid_x, grid_y, grid_z] = self
+                is_can_be_places = True
+
+        if is_can_be_places:
+            grid_factor = VOXEL_SIZE * 2
+            x = grid_x * grid_factor
+            y = grid_y * grid_factor
+            z = grid_z * grid_factor
+            if self.parent is not None:
+                self.localPosition = np.array([x, y, z])
+                self.globalPosition = np.array(self.parent.worldPosition) + np.array(self.localPosition)
+            else:
+                self.localPosition = np.array([0, 0, 0])
+                self.globalPosition = np.array([x, y, z])
 
     def delete_from_chunk(self):
         self.chunkRef.remove_voxel(self)
