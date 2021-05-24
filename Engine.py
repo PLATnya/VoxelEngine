@@ -185,6 +185,32 @@ class PressEndEvent(KeyDownEvent):
             self.game_session.change_state(self.state.AFTERLIFE)
 
 
+class ConstructMoveEvent(KeyDownEvent):
+    def __init__(self, pressed_buffer,key,way):
+        super().__init__(pressed_buffer)
+        self.key = key
+        self.way = way
+
+    def on_notify(self):
+        if super(ConstructMoveEvent, self).on_notify():
+            if self.game_session.construct_voxel is not None:
+                position = self.game_session.construct_voxel.grid_position
+                self.game_session.construct_voxel.set_position(*(position+self.way), False)
+
+
+class ConstructNewVoxelEvent(KeyDownEvent):
+    def __init__(self, pressed_buffer,key):
+        super().__init__(pressed_buffer)
+        self.key = key
+
+    def on_notify(self):
+        if super(ConstructNewVoxelEvent, self).on_notify():
+            if self.game_session.construct_voxel is not None:
+                position = self.game_session.construct_voxel.grid_position
+                from Voxel import Voxel
+                Voxel((1, 1, 0), position = position, is_indexed_by_matrix=True)
+
+
 class EventHandler:
 
     def __init__(self):
