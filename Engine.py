@@ -77,40 +77,37 @@ class CloseEvent(EventOnPygame):
 
 
 class KeyEvent(EventOnPygame):
-    def __init__(self, pressed_buffer):
+    def __init__(self):
         super().__init__(pg.KEYDOWN)
-        self.pressed_buffer = pressed_buffer
         self.key = None
 
     def action(self):
         self.key = self.event.key
-        self.pressed_buffer.append(self.key)
+        self.game_session.pressed_buffer.append(self.key)
 
 
 class KeyUpEvent(EventOnPygame):
-    def __init__(self, pressed_buffer):
+    def __init__(self):
         super().__init__(pg.KEYUP)
-        self.pressed_buffer = pressed_buffer
         self.key = None
 
     def action(self):
         self.key = self.event.key
-        self.pressed_buffer.remove(self.key)
+        self.game_session.pressed_buffer.remove(self.key)
 
 
 class CameraMoveEvent(EventNoPygame):
-    def __init__(self, pressed_buffer):
+    def __init__(self):
         super().__init__()
-        self.pressed_buffer = pressed_buffer
 
     def on_notify(self):
-        if pg.K_d in self.pressed_buffer:
+        if pg.K_d in self.game_session.pressed_buffer:
             main_camera.move_right(CAMERA_MOVEMENT_SPEED)
-        if pg.K_a in self.pressed_buffer:
+        if pg.K_a in self.game_session.pressed_buffer:
             main_camera.move_right(-CAMERA_MOVEMENT_SPEED)
-        if pg.K_w in self.pressed_buffer:
+        if pg.K_w in self.game_session.pressed_buffer:
             main_camera.move_forward(CAMERA_MOVEMENT_SPEED)
-        if pg.K_s in self.pressed_buffer:
+        if pg.K_s in self.game_session.pressed_buffer:
             main_camera.move_forward(-CAMERA_MOVEMENT_SPEED)
 
 
@@ -125,12 +122,11 @@ class CameraRotateEvent(EventNoPygame):
 
 
 class EscapeButtonExitEvent(EventNoPygame):
-    def __init__(self, pressed_buffer):
+    def __init__(self):
         super().__init__()
-        self.pressed_buffer = pressed_buffer
 
     def on_notify(self):
-        if pg.K_ESCAPE in self.pressed_buffer:
+        if pg.K_ESCAPE in self.game_session.pressed_buffer:
             exit()
             pg.quit()
             sys.exit()
@@ -139,25 +135,24 @@ class EscapeButtonExitEvent(EventNoPygame):
 class KeyDownEvent(EventNoPygame):
     pressed = False
 
-    def __init__(self, pressed_buffer):
+    def __init__(self):
         super().__init__()
         self.key = None
-        self.pressed_buffer = pressed_buffer
 
     def on_notify(self):
         if not self.pressed:
-            if self.key in self.pressed_buffer:
+            if self.key in self.game_session.pressed_buffer:
                 self.pressed = True
                 return True
         else:
-            if self.key not in self.pressed_buffer:
+            if self.key not in self.game_session.pressed_buffer:
                 self.pressed = False
         return False
 
 
 class PressRestartEvent(KeyDownEvent):
-    def __init__(self, pressed_buffer):
-        super().__init__(pressed_buffer)
+    def __init__(self):
+        super().__init__()
         self.key = pg.K_r
 
     def on_notify(self):
@@ -166,8 +161,8 @@ class PressRestartEvent(KeyDownEvent):
 
 
 class PressStartEvent(KeyDownEvent):
-    def __init__(self, pressed_buffer):
-        super().__init__(pressed_buffer)
+    def __init__(self):
+        super().__init__()
         self.key = pg.K_SPACE
 
     def on_notify(self):
@@ -176,8 +171,8 @@ class PressStartEvent(KeyDownEvent):
 
 
 class PressEndEvent(KeyDownEvent):
-    def __init__(self, pressed_buffer):
-        super().__init__(pressed_buffer)
+    def __init__(self):
+        super().__init__()
         self.key = pg.K_q
 
     def on_notify(self):
@@ -186,8 +181,8 @@ class PressEndEvent(KeyDownEvent):
 
 
 class ConstructMoveEvent(KeyDownEvent):
-    def __init__(self, pressed_buffer,key,way):
-        super().__init__(pressed_buffer)
+    def __init__(self,key,way):
+        super().__init__()
         self.key = key
         self.way = way
 
@@ -199,8 +194,8 @@ class ConstructMoveEvent(KeyDownEvent):
 
 
 class ConstructNewVoxelEvent(KeyDownEvent):
-    def __init__(self, pressed_buffer,key):
-        super().__init__(pressed_buffer)
+    def __init__(self, key):
+        super().__init__()
         self.key = key
 
     def on_notify(self):

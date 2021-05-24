@@ -31,9 +31,9 @@ class GameSessionMeta(type):
             cls.actor_manager = ActorManager()
             from Voxel import Voxel
             cls.construct_voxel = Voxel((0, 1, 0), is_indexed_by_matrix=False)
-            cls.restart_event = PressRestartEvent(cls.pressed_buffer)
-            cls.start_event = PressStartEvent(cls.pressed_buffer)
-            cls.end_event = PressEndEvent(cls.pressed_buffer)
+            cls.restart_event = PressRestartEvent()
+            cls.start_event = PressStartEvent()
+            cls.end_event = PressEndEvent()
         return cls._instances[cls]
 
 
