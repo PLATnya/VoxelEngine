@@ -12,7 +12,7 @@ VOXEL_SIZE = 1
 
 class Camera:
     def __init__(self):
-        self.position = glm.vec3(100,100, -5)
+        self.position = glm.vec3(100, 100, -5)
         self.forward = glm.vec3(0, 0, 1)
         self.right = glm.vec3(1, 0, 0)
         self.up = glm.vec3(0, 1, 0)
@@ -52,6 +52,10 @@ def graphic_setup():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
     main_camera.look()
+
+
+def change_bg_color(color):
+    glClearColor(*color)
 
 
 def clear_screen():

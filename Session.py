@@ -1,5 +1,5 @@
 from enum import Enum
-from GraphicsEngine import pg, clear_screen, graphic_setup
+from GraphicsEngine import pg, clear_screen, graphic_setup, change_bg_color
 from Engine import EventHandler, ChunkManager, ActorManager
 from Engine import PressEndEvent, PressStartEvent, PressRestartEvent, MAKE_STEP_EVENT
 import numpy as np
@@ -59,6 +59,8 @@ class GameSession(metaclass=GameSessionMeta):
 
     def change_state(self, new_state):
         if new_state == GameSessionState.PRELIFE:
+            change_bg_color((0,0,0,1))
+
             self.matrix_field.clear_instanced_buff()
             self.construct_voxel.isActive = True
             self.matrix_field.load_buff()
@@ -66,6 +68,7 @@ class GameSession(metaclass=GameSessionMeta):
             self.events_handler.add_event(self.start_event)
 
         elif new_state == GameSessionState.LIFE:
+            change_bg_color((0.7, 0.3, 0.2, 1))
             self.matrix_field.save_buff()
             pg.time.set_timer(MAKE_STEP_EVENT, self.step_delay_time, -1)
 
@@ -74,6 +77,7 @@ class GameSession(metaclass=GameSessionMeta):
             self.events_handler.add_event(self.end_event)
 
         elif new_state == GameSessionState.AFTERLIFE:
+            change_bg_color((0.5, 0.5, 0.5, 1))
             pg.time.set_timer(MAKE_STEP_EVENT, 0)
             self.construct_voxel.isActive = False
             # add restart button or event
@@ -100,7 +104,6 @@ class MatrixField:
         self.buff_indexes = np.argwhere(np.invert(self.matrix[:, :, 0] == None))
 
     def load_buff(self):
-        print(self.buff_indexes)
         if self.buff_indexes.size > 0:
             for index in self.buff_indexes:
                 from Voxel import Voxel
@@ -122,9 +125,9 @@ class MatrixField:
         self.buff_instanced_indexes.append([x, y])
 
     def remove_instanced_voxel(self, x, y):
-       # if self.matrix[x, y, 0] is not None:
-        self.matrix[x, y, 0].delete_from_chunk()
-        self.matrix[x, y, 0] = None
+        if self.matrix[x, y, 0] is not None:
+            self.matrix[x, y, 0].delete_from_chunk()
+            self.matrix[x, y, 0] = None
 
     def calc_neighbors(self, i, j):
         if self.matrix[i, j, 0] is not None:
