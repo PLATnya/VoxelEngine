@@ -66,7 +66,7 @@ class GameSession(metaclass=GameSessionMeta):
             self.events_handler.add_event(self.start_event)
             from Voxel import Voxel
             for i in range(1, 10):
-                position = np.array([i, 0, 0])
+                position = np.array([i, 0])
                 self.matrix_field.buff_instanced_indexes += [position]
                 Voxel((1, 1, 0), position=position)
 
@@ -97,8 +97,8 @@ class GameSession(metaclass=GameSessionMeta):
 
 class MatrixField:
     def __init__(self):
-        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE, 2), dtype=object)
-        self.matrix[:, :, :, 1] = 0
+        self.matrix = np.empty((MATRIX_SIZE, MATRIX_SIZE, 2), dtype=object)
+        self.matrix[:, :, 1] = 0
         self.buff_indexes = np.array([])
         self.buff_instanced_indexes = []
 
@@ -109,24 +109,24 @@ class MatrixField:
         self.matrix[key] = value
 
     def save_buff(self):
-        self.buff_indexes = np.argwhere(np.invert(self.matrix[:, :, :, 0] == None))
+        self.buff_indexes = np.argwhere(np.invert(self.matrix[:, :, 0] == None))
 
     def load_buff(self):
         if self.buff_indexes.size > 0:
             for n, index in enumerate(self.buff_indexes):
                 from Voxel import Voxel
-                self.matrix[index[0], index[1], index[2], 0] = Voxel((1, 0, 1), position=index)
+                self.matrix[index[0], index[1], 0] = Voxel((1, 0, 1), position=index)
 
     def is_empty(self):
-        voxels_matrix = self.matrix[:, :, :, 0]
+        voxels_matrix = self.matrix[:, :, 0]
         return (np.sum(voxels_matrix == None) / np.size(voxels_matrix)) == 1.0
 
     def clear_instanced_buff(self):
         if len(self.buff_instanced_indexes) > 0:
             for n, index in enumerate(self.buff_instanced_indexes):
                 from Voxel import Voxel
-                self.matrix[index[0], index[1], index[2], 0].delete_from_chunk()
-                self.matrix[index[0], index[1], index[2], 0] = None
+                self.matrix[index[0], index[1], 0].delete_from_chunk()
+                self.matrix[index[0], index[1], 0] = None
         self.buff_instanced_indexes = []
 
 
@@ -136,11 +136,11 @@ class MatrixField:
         for x in range(MATRIX_SIZE):
             for y in range(MATRIX_SIZE):
                 for z in range(MATRIX_SIZE):
-                    if self.matrix[x, y, z, 1] >= 3:
-                        if self.matrix[x, y, z, 0] is None:
-                            self.matrix[x, y, z, 0] = Voxel((0, 0, 1), position=(x, y, z))
+                    if self.matrix[x, y, 1] >= 3:
+                        if self.matrix[x, y, 0] is None:
+                            self.matrix[x, y, 0] = Voxel((0, 0, 1), position=(x, y))
                     else:
-                        if self.matrix[x, y, z, 0] is not None:
-                            self.matrix[x, y, z, 0].delete_from_chunk()
-                            self.matrix[x, y, z, 0] = None
+                        if self.matrix[x, y, 0] is not None:
+                            self.matrix[x, y, 0].delete_from_chunk()
+                            self.matrix[x, y, 0] = None
 
