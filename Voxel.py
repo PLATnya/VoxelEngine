@@ -23,14 +23,34 @@ class Voxel:
         if actor is not None:
             actor.voxels.append(self)
             self.parent = actor
+        self.grid_position = None
         self.set_position(*position, is_indexed_by_matrix)
 
+    def calc_neighbors(self, i, j, k, value):
+        x = np.max([0, i - 1])
+        matrix_limit = Session.MATRIX_SIZE - 1
+        while x <= np.min([i + 1, matrix_limit]):
+            y = np.max([0, j - 1])
+            while y <= np.min([j + 1, matrix_limit]):
+                z = np.max([0, k - 1])
+                while z <= np.min([k + 1, matrix_limit]):
+                    if (x != i) or (y != j) or (z != k):
+                        if Session.GameSession().matrix_field[x, y, z, 1] is None:
+                            Session.GameSession().matrix_field[x, y, z, 1] = 0
+                        else:
+                            Session.GameSession().matrix_field[x, y, z, 1] += value
+                    z += 1
+                y += 1
+            x += 1
+
     def set_position(self, grid_x, grid_y, grid_z, is_indexed_by_matrix):
-        is_can_be_places= True
+        self.grid_position = np.array([grid_x, grid_y, grid_z])
+        is_can_be_places = True
 
         if is_indexed_by_matrix:
             if Session.GameSession().matrix_field[grid_x, grid_y, grid_z, 0] is None:
-                Session.GameSession().matrix_field[grid_x, grid_y, grid_z] = self
+                self.calc_neighbors(grid_x, grid_y, grid_z,1)
+                Session.GameSession().matrix_field[grid_x, grid_y, grid_z, 0] = self
                 is_can_be_places = True
 
         if is_can_be_places:
@@ -47,6 +67,7 @@ class Voxel:
 
     def delete_from_chunk(self):
         self.chunkRef.remove_voxel(self)
+        self.calc_neighbors(*self.grid_position, -1)
 
     def __del__(self):
         print("deleting voxel")

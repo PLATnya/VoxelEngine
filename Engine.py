@@ -8,6 +8,7 @@ CAMERA_MOVEMENT_SPEED = 0.3
 
 CAMERA_ROTATION_SPEED = 0.002
 
+MAKE_STEP_EVENT = pg.USEREVENT+1
 
 class ChunkManager:
     def __init__(self):
@@ -64,6 +65,14 @@ class EventOnPygame(Event):
         self.event = event
         if self.event_type == event.type:
             self.action()
+
+
+class StepEvent(EventOnPygame):
+    def __init__(self):
+        super().__init__(MAKE_STEP_EVENT)
+
+    def action(self):
+        self.game_session.matrix_field.make_step()
 
 
 class CloseEvent(EventOnPygame):
