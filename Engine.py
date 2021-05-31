@@ -215,6 +215,19 @@ class ConstructNewVoxelEvent(KeyDownEvent):
                 Voxel((1, 1, 0), position = position, is_indexed_by_matrix=True)
 
 
+class DestroyNewVoxelEvent(KeyDownEvent):
+    def __init__(self, key):
+        super().__init__()
+        self.key = key
+
+    def on_notify(self):
+        if super(DestroyNewVoxelEvent, self).on_notify():
+            if self.game_session.construct_voxel is not None:
+                position = self.game_session.construct_voxel.grid_position
+                self.game_session.matrix_field[position[0],position[1],0].delete_from_chunk()
+                self.game_session.matrix_field[position[0],position[1], 0] = None
+
+
 class EventHandler:
 
     def __init__(self):

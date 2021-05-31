@@ -12,7 +12,7 @@ VOXEL_SIZE = 1
 
 class Camera:
     def __init__(self):
-        self.position = glm.vec3(0, 0, 0)
+        self.position = glm.vec3(100,100, -5)
         self.forward = glm.vec3(0, 0, 1)
         self.right = glm.vec3(1, 0, 0)
         self.up = glm.vec3(0, 1, 0)
